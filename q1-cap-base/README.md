@@ -1,5 +1,7 @@
 ## Soal 1 – Teorema CAP, BASE, dan Keterkaitannya
 
+> Jelaskan teorema CAP dan BASE dan keterkaitannya keduanya. Jelaskan menggunakan contoh yang pernah anda gunakan.
+
 ## 1. Teorema CAP
 
 Teorema **CAP** menjelaskan kompromi mendasar yang dihadapi *distributed data store* ketika terjadi *network partition*. Secara ringkas, teorema ini menyatakan bahwa dalam kondisi terjadi *partition*, sebuah *distributed system* hanya dapat menjamin **paling banyak dua** dari tiga properti berikut secara bersamaan:
