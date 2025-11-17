@@ -4,6 +4,13 @@ This repository is presented in Indonesian
 
 Mata kuliah ini diampu oleh **Dr. Bambang Purnomosidi Dwi Putranto, S.E., Akt., S.Kom., MMSI** ([https://github.com/bpdp](https://github.com/bpdp)).
 
+### Identitas Mahasiswa
+
+Nama: **Gilang Teja Krishna**
+NIM: **225410001**
+
+---
+
 Repositori ini berisi jawaban Ujian Tengah Semester (UTS) untuk mata kuliah **Sistem Terdistribusi dan Terdesentralisasi**. Seluruh jawaban ditulis dalam Bahasa Indonesia menggunakan format Markdown dan diorganisasikan per soal.
 
 Di dalam repositori ini dosen dapat menemukan:
