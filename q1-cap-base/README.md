@@ -128,3 +128,108 @@ Contoh ini menunjukkan bahwa bahkan pada aplikasi Python terdistribusi yang sede
 - Operasi mana yang harus tetap *strongly consistent* ketika terjadi kegagalan (kecenderungan CP)?
 - Operasi mana yang dapat mentoleransi *temporary inconsistency* demi memperoleh *availability* dan kinerja yang lebih baik (kecenderungan AP/BASE)?
 
+### 4.4 Implementasi program contoh (folder `project/`)
+
+Untuk memperjelas contoh pada poin 4, telah disiapkan sebuah program Python sederhana di dalam folder:
+
+- `q1-cap-base/project/`
+
+Program ini terdiri atas tiga komponen utama yang berjalan di dalam container:
+
+- **API service** (Python + FastAPI) pada service `api`.
+- **PostgreSQL database** pada service `db` sebagai primary store yang durabel.
+- **Redis cache** pada service `redis` sebagai lapisan cache untuk operasi baca.
+
+#### 4.4.1 Cuplikan `docker-compose.yml`
+
+Berikut adalah cuplikan berkas `q1-cap-base/project/docker-compose.yml` yang menggambarkan ketiga service tersebut:
+
+```yaml
+version: "3.9"
+
+services:
+  api:
+    build: ./app
+    container_name: q1-api-service
+    environment:
+      - DATABASE_URL=postgresql://app_user:app_password@db:5432/app_db
+      - REDIS_URL=redis://redis:6379/0
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+      - redis
+
+  db:
+    image: postgres:16
+    container_name: q1-postgres
+    environment:
+      - POSTGRES_DB=app_db
+      - POSTGRES_USER=app_user
+      - POSTGRES_PASSWORD=app_password
+    ports:
+      - "5434:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+
+  redis:
+    image: redis:7
+    container_name: q1-redis
+    ports:
+      - "6380:6379"
+    volumes:
+      - redis_data:/data
+
+volumes:
+  db_data:
+  redis_data:
+```
+
+Konfigurasi ini mencerminkan contoh pada poin 4:
+
+- PostgreSQL bertindak sebagai **CP-like primary store** untuk data yang durabel.
+- Redis digunakan sebagai **BASE-style cache** yang dapat berisi data sedikit usang tetapi mempercepat *read-heavy endpoint*.
+
+#### 4.4.2 Cuplikan kode API (`project/app/main.py`)
+
+Berikut cuplikan endpoint utama pada `project/app/main.py` yang mengimplementasikan pola *cache-aside* menggunakan Redis dan PostgreSQL:
+
+```python
+@app.get("/items/{item_id}", response_model=ItemResponse)
+def get_item(item_id: int):
+    """Mengambil item berdasarkan ID dengan pola cache-aside."""
+    r = get_redis_client()
+
+    cache_key = f"item:{item_id}"
+    cached = r.get(cache_key)
+    if cached is not None:
+        data = json.loads(cached)
+        return ItemResponse(**data, source="cache")
+
+    # Jika tidak ada di cache, baca dari PostgreSQL
+    with get_db_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                "SELECT id, name, description FROM items WHERE id = %s",
+                (item_id,),
+            )
+            row = cur.fetchone()
+
+    if row is None:
+        raise HTTPException(status_code=404, detail="Item not found")
+
+    item_data = {"id": row[0], "name": row[1], "description": row[2]}
+
+    # Simpan ke cache untuk permintaan berikutnya (misalnya selama 60 detik)
+    r.setex(cache_key, 60, json.dumps(item_data))
+
+    return ItemResponse(**item_data, source="database")
+```
+
+Cuplikan ini menunjukkan dengan jelas alur yang dijelaskan pada poin 4 sebelumnya:
+
+- Bila data tersedia di Redis, API mengembalikan hasil dari cache (*source = "cache"*).
+- Bila data tidak ada di cache, API mengambil data dari PostgreSQL, kemudian menyimpannya di Redis untuk permintaan berikutnya (*source = "database"*).
+
+Dengan demikian, folder `project/` memberikan implementasi konkret dari kompromi CAP dan BASE yang dibahas secara konseptual pada bagian 4.
