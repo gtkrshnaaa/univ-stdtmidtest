@@ -1,5 +1,7 @@
 ## Soal 2 – GraphQL dan Komunikasi Antar Proses dalam Sistem Terdistribusi
 
+> Jelaskan keterkaitan antara GraphQL dengan komunikasi antar proses pada sistem terdistribusi. Buat diagramnya.
+
 ## 1. GraphQL dalam sistem terdistribusi
 
 **GraphQL** adalah *query language* untuk API sekaligus *runtime* untuk mengeksekusi *query* tersebut terhadap data yang sudah ada. Dari sudut pandang *distributed system*, GraphQL umumnya berperan sebagai **gateway** atau **API facade**:
