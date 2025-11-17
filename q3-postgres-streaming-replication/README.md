@@ -1,5 +1,7 @@
 ## Soal 3 – PostgreSQL Streaming Replication dengan Docker Compose
 
+> Dengan menggunakan Docker / Docker Compose, buatlah streaming replication di PostgreSQL yang bisa menjelaskan sinkronisasi. Tulislah langkah-langkah pengerjaannya dan buat penjelasan secukupnya.
+
 ## 1. Tujuan dan gambaran umum
 
 Tujuan latihan ini adalah menyiapkan **PostgreSQL streaming replication** menggunakan **Docker Compose**. Konfigurasi ini menunjukkan bagaimana perubahan yang ditulis pada *primary database instance* direplikasi secara otomatis ke *standby instance*, sehingga menjelaskan cara kerja sinkronisasi pada level *write-ahead log (WAL)*.
