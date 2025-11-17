@@ -4,6 +4,8 @@ This repository is presented in Indonesian
 
 Mata kuliah ini diampu oleh **Dr. Bambang Purnomosidi Dwi Putranto, S.E., Akt., S.Kom., MMSI** ([https://github.com/bpdp](https://github.com/bpdp)).
 
+---
+
 ### Identitas Mahasiswa
 
 Nama: **Gilang Teja Krishna**
